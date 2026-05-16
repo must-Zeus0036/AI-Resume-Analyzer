@@ -10,34 +10,24 @@ dotenv.config();
 
 const app = express();
 
-// PDF PARSE
+// FIX PDF PARSE
 const require = createRequire(import.meta.url);
 const pdfParse = require("pdf-parse");
 
 // CORS
-const allowedOrigins = [
-    "http://localhost:5173",
-    "https://ai-resume-analyzer-xi-plum.vercel.app",
-];
-
 app.use(
     cors({
-        origin: function (origin, callback) {
-            if (!origin) return callback(null, true);
-
-            if (allowedOrigins.includes(origin)) {
-                callback(null, true);
-            } else {
-                callback(new Error("Not allowed by CORS"));
-            }
-        },
+        origin: [
+            "http://localhost:5173",
+            "https://ai-resume-analyzer-xi-plum.vercel.app",
+        ],
     })
 );
 
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
-// Uploads folder
+// Upload folder
 const uploadDir = "uploads";
 
 if (!fs.existsSync(uploadDir)) {
@@ -52,9 +42,9 @@ const upload = multer({
 // Gemini
 const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
 
-// route
+// Test route
 app.get("/", (req, res) => {
-    res.send("Resume Analyzer API Running");
+    res.send("Server is running");
 });
 
 // Analyze route
@@ -62,48 +52,31 @@ app.post("/analyze", upload.single("resume"), async (req, res) => {
     let filePath = null;
 
     try {
-        console.log("FILE:", req.file);
-        console.log("BODY:", req.body);
-
         if (!req.file) {
             return res.status(400).json({
                 success: false,
-                message: "No file uploaded",
+                message: "No resume uploaded",
             });
         }
 
         filePath = req.file.path;
 
-        const jobDescription = req.body.jobDescription?.trim();
+        const jobDescription = req.body.jobDescription;
 
         if (!jobDescription) {
             return res.status(400).json({
                 success: false,
-                message: "Job description is required",
-            });
-        }
-
-        if (!process.env.GEMINI_API_KEY) {
-            return res.status(500).json({
-                success: false,
-                message: "Missing GEMINI_API_KEY",
+                message: "Job description required",
             });
         }
 
         // READ PDF
-        const dataBuffer = fs.readFileSync(filePath);
+        const pdfBuffer = fs.readFileSync(filePath);
 
-        // THIS IS THE FIX
-        const pdfData = await pdfParse(dataBuffer);
+        // THIS IS THE ONLY CORRECT WAY
+        const pdfData = await pdfParse(pdfBuffer);
 
         const resumeText = pdfData.text;
-
-        if (!resumeText || resumeText.trim() === "") {
-            return res.status(400).json({
-                success: false,
-                message: "Could not extract text from PDF",
-            });
-        }
 
         // Gemini model
         const model = genAI.getGenerativeModel({
@@ -114,11 +87,11 @@ app.post("/analyze", upload.single("resume"), async (req, res) => {
 Analyze this resume against the job description.
 
 Return:
-1. Match Score (0-100)
-2. Strengths
-3. Missing Skills
-4. Improvements
-5. ATS Optimization Tips
+- Match Score
+- Strengths
+- Missing Skills
+- Improvements
+- ATS Tips
 
 Resume:
 ${resumeText}
@@ -131,19 +104,18 @@ ${jobDescription}
 
         const response = result.response.text();
 
-        return res.json({
+        res.json({
             success: true,
             analysis: response,
         });
     } catch (error) {
-        console.error("BACKEND ERROR:", error);
+        console.error(error);
 
-        return res.status(500).json({
+        res.status(500).json({
             success: false,
-            message: error.message || "Server error",
+            message: error.message,
         });
     } finally {
-        // Delete uploaded file
         if (filePath && fs.existsSync(filePath)) {
             fs.unlinkSync(filePath);
         }
