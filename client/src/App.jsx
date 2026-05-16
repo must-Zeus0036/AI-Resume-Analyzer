@@ -53,18 +53,26 @@ function App() {
 
   // JSX Return - Main UI
   return (
-    <div className="min-h-screen bg-gray-100 p-10">
+    <div className="min-h-screen bg-gray-900 p-10">
       <div className="max-w-4xl mx-auto bg-white rounded-2xl shadow p-8">
         <h1 className="text-4xl font-bold mb-6">
           AI Resume Analyzer
         </h1>
 
-        <input
-          type="file"
-          accept=".pdf"
-          onChange={(e) => setFile(e.target.files[0])}
-          className="mb-4 block"
-        />
+  <label className="mb-4 flex flex-col items-center justify-center w-full h-32 border-2 border-gray-300 border-dashed rounded-lg cursor-pointer bg-gray-50 hover:bg-gray-100">
+  <div className="flex flex-col items-center justify-center pt-5 pb-6">
+    <p className="mb-2 text-sm text-gray-500 font-semibold">
+      {file ? `Selected: ${file.name}` : "Click to upload your resume"}
+    </p>
+    <p className="text-xs text-gray-400">PDF files only</p>
+  </div>
+  <input
+    type="file"
+    accept=".pdf"
+    onChange={(e) => setFile(e.target.files[0])}
+    className="hidden" 
+  />
+</label>
 
         <textarea
           placeholder="Paste Job Description"
@@ -90,6 +98,9 @@ function App() {
           </div>
         )}
       </div>
+      <footer className="mt-8 text-center text-gray-500 text-sm">
+        &copy; By Mustafa Al-Bayati
+      </footer>
     </div>
   );
 }
