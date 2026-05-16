@@ -12,8 +12,7 @@ const app = express();
 
 // REQUIRED for Commonjs Libs
 const require = createRequire(import.meta.url);
-const pdfParseModule = require("pdf-parse");
-const pdfParse = pdfParseModule.default || pdfParseModule;
+const pdfParse = require("pdf-parse");
 
 // Middleware - Updated CORS to support both local testing and production deployments
 const allowedOrigins = [
