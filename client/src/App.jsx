@@ -15,7 +15,7 @@ function App() {
       alert("Please upload resume and add job description");
       return;
     }
-
+    const BACKEND_URL = import.meta.env.VITE_API_URL || "http://localhost:5000";
     try {
       setLoading(true);
 
@@ -25,7 +25,7 @@ function App() {
 
       // Send POST request to backend
       const response = await axios.post(
-        "http://localhost:5000/analyze",
+        `${BACKEND_URL}/analyze`,
         formData,
         {
           headers: {
@@ -59,20 +59,20 @@ function App() {
           AI Resume Analyzer
         </h1>
 
-  <label className="mb-4 flex flex-col items-center justify-center w-full h-32 border-2 border-gray-300 border-dashed rounded-lg cursor-pointer bg-gray-50 hover:bg-gray-100">
-  <div className="flex flex-col items-center justify-center pt-5 pb-6">
-    <p className="mb-2 text-sm text-gray-500 font-semibold">
-      {file ? `Selected: ${file.name}` : "Click to upload your resume"}
-    </p>
-    <p className="text-xs text-gray-400">PDF files only</p>
-  </div>
-  <input
-    type="file"
-    accept=".pdf"
-    onChange={(e) => setFile(e.target.files[0])}
-    className="hidden" 
-  />
-</label>
+        <label className="mb-4 flex flex-col items-center justify-center w-full h-32 border-2 border-gray-300 border-dashed rounded-lg cursor-pointer bg-gray-50 hover:bg-gray-100">
+          <div className="flex flex-col items-center justify-center pt-5 pb-6">
+            <p className="mb-2 text-sm text-gray-500 font-semibold">
+              {file ? `Selected: ${file.name}` : "Click to upload your resume"}
+            </p>
+            <p className="text-xs text-gray-400">PDF files only</p>
+          </div>
+          <input
+            type="file"
+            accept=".pdf"
+            onChange={(e) => setFile(e.target.files[0])}
+            className="hidden"
+          />
+        </label>
 
         <textarea
           placeholder="Paste Job Description"
