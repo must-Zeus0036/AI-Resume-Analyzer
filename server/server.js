@@ -88,7 +88,8 @@ app.post("/analyze", upload.single("resume"), async (req, res) => {
 
         // Parse PDF Buffer Content Safely
         const dataBuffer = fs.readFileSync(filePath);
-        const pdfData = await pdfParse(dataBuffer);
+        const parsePDF = pdfParse.default || pdfParse;
+        const pdfData = await parsePDF(dataBuffer);
         const resumeText = pdfData.text;
 
         if (!resumeText) {
