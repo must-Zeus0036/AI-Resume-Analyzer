@@ -10,19 +10,18 @@ dotenv.config();
 
 const app = express();
 
-// REQUIRED for Commonjs Libs
-import * as pdfParseModule from "pdf-parse";
-const pdfParse = pdfParseModule.default || pdfParseModule;
+// Safe CommonJS dependency loading for ES Modules
+const require = createRequire(import.meta.url);
+const pdfParse = require("pdf-parse");
 
-// Middleware - Updated CORS to support both local testing and production deployments
+// Production CORS configuration
 const allowedOrigins = [
     "http://localhost:5173",
-    "https://ai-resume-analyzer-xi-plum.vercel.app" // Your live Vercel domain
+    "https://ai-resume-analyzer-xi-plum.vercel.app"
 ];
 
 app.use(cors({
     origin: function (origin, callback) {
-        // Allow requests with no origin (like mobile apps, curl requests, or postman)
         if (!origin) return callback(null, true);
         if (allowedOrigins.indexOf(origin) !== -1) {
             return callback(null, true);
@@ -39,7 +38,6 @@ app.use(express.urlencoded({ extended: true }));
 
 // File upload setup
 const uploadDir = "uploads";
-
 if (!fs.existsSync(uploadDir)) {
     fs.mkdirSync(uploadDir, { recursive: true });
 }
@@ -48,17 +46,15 @@ const upload = multer({
     dest: uploadDir,
 });
 
-// GEMINI ai setup
+// Gemini AI Setup
 const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
 
-// Routes
-
-// get request to check if server is running
+// Root route to verify server health status
 app.get("/", (req, res) => {
     res.send("Resume Analyzer API Running");
 });
 
-// Analyze resume
+// Core resume analyzer engine
 app.post("/analyze", upload.single("resume"), async (req, res) => {
     const filePath = req.file?.path;
 
@@ -68,7 +64,7 @@ app.post("/analyze", upload.single("resume"), async (req, res) => {
 
         const jobDescription = (req.body.jobDescription || "").trim();
 
-        // VALIDATION
+        // System Input Validations
         if (!req.file) {
             return res.status(400).json({
                 success: false,
@@ -90,10 +86,9 @@ app.post("/analyze", upload.single("resume"), async (req, res) => {
             });
         }
 
-        // PDF Parsing
+        // Parse PDF Buffer Content Safely
         const dataBuffer = fs.readFileSync(filePath);
-        const pdfData = await pdfParse(dataBuffer); // Keep it clean like this
-
+        const pdfData = await pdfParse(dataBuffer);
         const resumeText = pdfData.text;
 
         if (!resumeText) {
@@ -103,7 +98,7 @@ app.post("/analyze", upload.single("resume"), async (req, res) => {
             });
         }
 
-        // GEMINI prompt and response - Adjusted to production model target
+        // Initialize production flash intelligence layer
         const model = genAI.getGenerativeModel({
             model: "gemini-2.5-flash",
         });
@@ -135,22 +130,21 @@ ${jobDescription}
 
     } catch (error) {
         console.log("BACKEND ERROR:", error);
-
         return res.status(500).json({
             success: false,
             message: error?.message || "Server error",
         });
 
     } finally {
+        // Safe filesystem teardown
         if (filePath && fs.existsSync(filePath)) {
             fs.unlinkSync(filePath);
         }
     }
 });
 
-// START SERVER
+// Server Initialization
 const PORT = process.env.PORT || 5000;
-
 app.listen(PORT, () => {
     console.log(`Server running on port ${PORT}`);
 });
