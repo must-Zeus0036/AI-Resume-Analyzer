@@ -1,0 +1,39 @@
+# Logs
+logs
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+lerna-debug.log*
+
+# Dependencies (Catches them at root and inside subfolders)
+node_modules/
+**/node_modules/
+
+# Production builds
+dist/
+dist-ssr/
+build/
+
+# Application Specific uploads
+uploads/
+**/uploads/
+server/uploads/
+
+# Local env files & Secrets
+.env
+.env.local
+*.local
+**/.env
+
+# Editor directories and files
+.vscode/*
+!.vscode/extensions.json
+.idea
+.DS_Store
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.sw?
