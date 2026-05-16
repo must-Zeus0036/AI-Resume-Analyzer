@@ -11,7 +11,8 @@ dotenv.config();
 const app = express();
 
 // REQUIRED for Commonjs Libs
-import pdfParse from "pdf-parse";
+import * as pdfParseModule from "pdf-parse";
+const pdfParse = pdfParseModule.default || pdfParseModule;
 
 // Middleware - Updated CORS to support both local testing and production deployments
 const allowedOrigins = [
@@ -91,8 +92,8 @@ app.post("/analyze", upload.single("resume"), async (req, res) => {
 
         // PDF Parsing
         const dataBuffer = fs.readFileSync(filePath);
-        const parsePDF = typeof pdfParse === 'function' ? pdfParse : pdfParse.default;
-        const pdfData = await parsePDF(dataBuffer);
+        const pdfData = await pdfParse(dataBuffer); // Keep it clean like this
+
         const resumeText = pdfData.text;
 
         if (!resumeText) {
