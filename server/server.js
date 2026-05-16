@@ -15,10 +15,24 @@ const require = createRequire(import.meta.url);
 const pdfParseModule = require("pdf-parse");
 const pdfParse = pdfParseModule.default || pdfParseModule;
 
-// Middleware
+// Middleware - Updated CORS to support both local testing and production deployments
+const allowedOrigins = [
+    "http://localhost:5173",
+    "https://ai-resume-analyzer-xi-plum.vercel.app" // Your live Vercel domain
+];
+
 app.use(cors({
-    origin: "http://localhost:5173",
+    origin: function (origin, callback) {
+        // Allow requests with no origin (like mobile apps, curl requests, or postman)
+        if (!origin) return callback(null, true);
+        if (allowedOrigins.indexOf(origin) !== -1) {
+            return callback(null, true);
+        } else {
+            return callback(new Error("Not allowed by CORS"));
+        }
+    },
     methods: ["GET", "POST"],
+    allowedHeaders: ["Content-Type"]
 }));
 
 app.use(express.json());
@@ -89,9 +103,9 @@ app.post("/analyze", upload.single("resume"), async (req, res) => {
             });
         }
 
-        // GEMINI prompt and response
+        // GEMINI prompt and response - Adjusted to production model target
         const model = genAI.getGenerativeModel({
-            model: "gemini-3.1-flash-lite",
+            model: "gemini-2.5-flash",
         });
 
         const prompt = `
