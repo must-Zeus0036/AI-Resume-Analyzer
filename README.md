@@ -4,9 +4,10 @@ A web application that compares a user's resume against a specific job descripti
 
 ---
 
-## Application Preview
+## Application Preview & website 
+https://ai-resume-analyzer-xi-plum.vercel.app/ 
 
-![AI Resume Analyzer Interface](./screenshots/2.png)
+![AI Resume Analyzer Interface](./screenshots/a.png)
 
 ---
 
