@@ -3,16 +3,12 @@ import cors from "cors";
 import dotenv from "dotenv";
 import multer from "multer";
 import fs from "fs";
+import pdfParse from "pdf-parse";
 import { GoogleGenerativeAI } from "@google/generative-ai";
-import { createRequire } from "module";
 
 dotenv.config();
 
 const app = express();
-
-// FIX PDF PARSE
-const require = createRequire(import.meta.url);
-const pdfParse = require("pdf-parse");
 
 // CORS
 app.use(
@@ -73,14 +69,14 @@ app.post("/analyze", upload.single("resume"), async (req, res) => {
         // READ PDF
         const pdfBuffer = fs.readFileSync(filePath);
 
-        // THIS IS THE ONLY CORRECT WAY
+        // PARSE PDF
         const pdfData = await pdfParse(pdfBuffer);
 
         const resumeText = pdfData.text;
 
         // Gemini model
         const model = genAI.getGenerativeModel({
-            model: "gemini-2.0-flash",
+            model: "gemini-2.5-flash",
         });
 
         const prompt = `
@@ -108,6 +104,7 @@ ${jobDescription}
             success: true,
             analysis: response,
         });
+
     } catch (error) {
         console.error(error);
 
@@ -115,6 +112,7 @@ ${jobDescription}
             success: false,
             message: error.message,
         });
+
     } finally {
         if (filePath && fs.existsSync(filePath)) {
             fs.unlinkSync(filePath);
