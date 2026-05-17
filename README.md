@@ -6,7 +6,7 @@ A web application that compares a user's resume against a specific job descripti
 
 ## Application Preview
 
-![AI Resume Analyzer Interface](./screenshots/2.png)
+![AI Resume Analyzer Interface](./screenshots/a.png)
 
 ---
 
