@@ -103,7 +103,7 @@ function App() {
               : "bg-blue-600 hover:bg-blue-500 active:scale-[0.99]"
           }`}
         >
-          {loading ? "Analyzing Pipeline Active..." : "Analyze Resume"}
+          {loading ? "Analyzing Active..." : "Analyze Resume"}
         </button>
 
         {/* Analysis Presentation Panel */}
