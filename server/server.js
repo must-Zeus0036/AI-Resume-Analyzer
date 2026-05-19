@@ -6,11 +6,13 @@ import fs from "fs";
 import pdfParse from "pdf-parse";
 import { GoogleGenerativeAI } from "@google/generative-ai";
 
-dotenv.config();
 
+// Load environment variables from .env file
+dotenv.config();
+// Initialize Express app
 const app = express();
 
-// CORS
+// CORS configuration to allow requests from frontend
 app.use(
     cors({
         origin: [
@@ -30,20 +32,20 @@ if (!fs.existsSync(uploadDir)) {
     fs.mkdirSync(uploadDir, { recursive: true });
 }
 
-// Multer
+// Multer configuration for file uploads (only PDFs allowed)
 const upload = multer({
     dest: uploadDir,
 });
 
-// Gemini
+// Gemini API client initialization
 const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
 
-// Test route
+// Test route to verify server is running
 app.get("/", (req, res) => {
     res.send("Server is running");
 });
 
-// Analyze route
+// Analyze route to handle resume analysis requests
 app.post("/analyze", upload.single("resume"), async (req, res) => {
     let filePath = null;
 
@@ -74,7 +76,7 @@ app.post("/analyze", upload.single("resume"), async (req, res) => {
 
         const resumeText = pdfData.text;
 
-        // Gemini model
+        // Gemini model prompting
         const model = genAI.getGenerativeModel({
             model: "gemini-2.5-flash",
         });

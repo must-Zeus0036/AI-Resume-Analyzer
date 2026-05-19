@@ -1,5 +1,5 @@
 import { useState } from "react";
-import axios from "axios";
+import axios from "axios"; // For making HTTP requests to the backend
 
 // Main App Component
 function App() {
@@ -12,7 +12,7 @@ function App() {
   const handleAnalyze = async (e) => {
     if (e) e.preventDefault();
 
-    // 🛑 SAFETY LOCK 1: Stop parallel execution loops if already loading
+    // Safety check to prevent multiple submissions while loading
     if (loading) return;
 
     if (!file || !jobDescription) {
@@ -41,7 +41,7 @@ function App() {
         }
       );
 
-      setAnalysis(response.data.analysis);
+      setAnalysis(response.data.analysis); // Update analysis state with the result from backend
 
     } catch (error) {
       console.log("FULL ERROR:", error);
